@@ -125,6 +125,7 @@ Recommended flow:
 ## Contents
 
 - `schema/opensciflow-plugin.schema.json`
+- `examples/mdanalysis-trajectory-analysis/opensciflow.yaml`
 - `examples/gromacs-md-stability/opensciflow.yaml`
 - `examples/proteinflux-dynamics/opensciflow.yaml`
 - `examples/diffdock-docking/opensciflow.yaml`
@@ -140,4 +141,3 @@ Recommended flow:
 - Replacing package managers such as Conda, Spack, or Bioconda.
 - Replacing workflow engines such as Nextflow, Snakemake, CWL, AiiDA, or Parsl.
 - Certifying scientific correctness of a model/tool.
-

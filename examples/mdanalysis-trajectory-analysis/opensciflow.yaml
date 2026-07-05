@@ -1,0 +1,92 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "mdanalysis-trajectory-analysis"
+version: "0.1.0"
+domain: ["molecular-dynamics", "trajectory-analysis", "computational-biology"]
+task_types: ["trajectory-analysis", "md-stability-analysis", "protein-stability"]
+description: "Analyze molecular dynamics trajectories with MDAnalysis and produce RMSD, RMSF, radius of gyration, plots, and a report."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "MDAnalysis license applies to MDAnalysis; manifest Apache-2.0"
+  model_weights: "not-applicable"
+  data: "user-provided"
+citation:
+  preferred: "Cite MDAnalysis according to official guidance."
+  url: "https://www.mdanalysis.org/"
+inputs:
+  - name: "topology"
+    type: "file"
+    formats: ["pdb", "gro", "psf", "prmtop", "top"]
+    required: true
+    description: "Topology or structure file readable by MDAnalysis."
+  - name: "trajectory"
+    type: "file"
+    formats: ["xtc", "trr", "dcd", "nc", "pdb"]
+    required: true
+    description: "Trajectory file readable by MDAnalysis."
+  - name: "selection"
+    type: "string"
+    required: false
+    description: "Atom selection for alignment/analysis, for example 'protein and name CA'."
+outputs:
+  - { name: "rmsd_csv", type: "file", formats: ["csv"], required: true }
+  - { name: "rmsf_csv", type: "file", formats: ["csv"], required: true }
+  - { name: "rg_csv", type: "file", formats: ["csv"], required: true }
+  - { name: "plots", type: "directory", formats: ["png"], required: true }
+  - { name: "report", type: "file", formats: ["md", "html"], required: true }
+environment:
+  conda:
+    channels: ["conda-forge"]
+    packages:
+      - "python>=3.10"
+      - "mdanalysis"
+      - "numpy"
+      - "pandas"
+      - "matplotlib"
+  docker:
+    image: "to-be-filled"
+  apptainer:
+    image: "to-be-filled"
+hardware:
+  cpu_cores_min: 2
+  memory_gb_min: 4
+  gpu: false
+model_weights:
+  required: false
+  sources: []
+execution:
+  local:
+    command: "python analyze_md_stability.py --topology {inputs.topology} --trajectory {inputs.trajectory} --out {outputs_dir}"
+  slurm:
+    supported: true
+    recommended:
+      time: "00:30:00"
+      cpus_per_task: 2
+      mem: "8G"
+expected_runtime:
+  small_example: "1-5 min"
+  typical: "5-60 min depending on trajectory size"
+examples:
+  - name: "short protein trajectory"
+    inputs:
+      topology: "examples/inputs/topology.pdb"
+      trajectory: "examples/inputs/trajectory.xtc"
+    expected_outputs:
+      - "metrics/rmsd.csv"
+      - "metrics/rmsf.csv"
+      - "metrics/rg.csv"
+      - "plots/rmsd.png"
+validation:
+  dry_run_command: "python -c \"import MDAnalysis as mda; print(mda.__version__)\""
+  smoke_test:
+    command: "python analyze_md_stability.py --topology examples/inputs/topology.pdb --trajectory examples/inputs/trajectory.xtc --out test-output"
+    expected_files:
+      - "test-output/metrics/rmsd.csv"
+      - "test-output/metrics/rmsf.csv"
+      - "test-output/metrics/rg.csv"
+safety_notes:
+  - "Trajectory analysis can fail or mislead if topology and trajectory do not match."
+  - "RMSD, RMSF, and radius of gyration are descriptive metrics, not proof of binding or function."
+limitations:
+  - "Input preparation, atom selection, trajectory length, force field, and sampling quality strongly affect interpretation."
+  - "This plugin does not validate simulation setup or force-field correctness."
