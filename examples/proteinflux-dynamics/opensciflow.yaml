@@ -1,0 +1,51 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "proteinflux-conformational-dynamics"
+version: "0.1.0"
+domain: ["protein-dynamics", "computational-biology"]
+task_types: ["conformational-dynamics", "site-scoring", "trajectory-analysis"]
+description: "Analyze protein conformational dynamics and candidate functional sites using ProteinFlux-style workflows."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "project-specific license required"
+  model_weights: "project-specific"
+  data: "user-provided"
+citation:
+  preferred: "Cite the ProteinFlux project/paper when available."
+  url: null
+inputs:
+  - { name: "structure", type: "file", formats: ["pdb"], required: true }
+  - { name: "trajectory", type: "file", formats: ["xtc", "dcd", "pdb"], required: false }
+outputs:
+  - { name: "site_scores", type: "file", formats: ["csv"], required: true }
+  - { name: "report", type: "file", formats: ["md", "html"], required: true }
+environment:
+  conda:
+    channels: ["conda-forge", "pytorch"]
+    packages: ["python>=3.10", "pytorch", "numpy", "pandas", "mdanalysis"]
+hardware:
+  cpu_cores_min: 4
+  memory_gb_min: 8
+  gpu: "optional"
+model_weights:
+  required: "optional"
+  sources:
+    - name: "ProteinFlux weights"
+      url: "to-be-filled"
+      checksum: "to-be-filled"
+execution:
+  local:
+    command: "proteinflux analyze --structure {inputs.structure} --trajectory {inputs.trajectory} --out {outputs_dir}"
+  slurm:
+    supported: false
+expected_runtime:
+  small_example: "5-20 min"
+examples:
+  - name: "single protein example"
+validation:
+  dry_run_command: "proteinflux --help"
+safety_notes:
+  - "Predicted dynamic sites require experimental or simulation validation."
+limitations:
+  - "Manifest fields must be updated once the exact ProteinFlux package interface is finalized."
+

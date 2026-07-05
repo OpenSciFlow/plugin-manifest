@@ -1,0 +1,56 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "diffdock-docking"
+version: "0.1.0"
+domain: ["molecular-docking", "drug-discovery"]
+task_types: ["protein-ligand-docking", "pose-prediction"]
+description: "Run DiffDock-style protein-ligand docking and collect predicted poses and confidence scores."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "DiffDock license applies; manifest Apache-2.0"
+  model_weights: "DiffDock model license applies"
+  data: "user-provided"
+citation:
+  preferred: "Cite DiffDock according to the official repository/paper."
+  url: "https://github.com/gcorso/DiffDock"
+inputs:
+  - { name: "protein", type: "file", formats: ["pdb"], required: true }
+  - { name: "ligand", type: "file", formats: ["sdf", "mol2", "smiles"], required: true }
+outputs:
+  - { name: "poses", type: "directory", formats: ["sdf"], required: true }
+  - { name: "scores", type: "file", formats: ["csv"], required: true }
+environment:
+  conda:
+    channels: ["conda-forge", "pytorch", "pyg"]
+    packages: ["python>=3.10", "pytorch", "rdkit"]
+hardware:
+  cpu_cores_min: 4
+  memory_gb_min: 16
+  gpu: "recommended"
+model_weights:
+  required: true
+  sources:
+    - name: "DiffDock weights"
+      url: "see official repository"
+      checksum: "to-be-filled"
+execution:
+  local:
+    command: "python -m inference --protein_path {inputs.protein} --ligand {inputs.ligand} --out_dir {outputs_dir}"
+  slurm:
+    supported: true
+    recommended:
+      time: "02:00:00"
+      cpus_per_task: 4
+      mem: "24G"
+      gres: "gpu:1"
+expected_runtime:
+  small_example: "5-30 min on GPU"
+examples:
+  - name: "single ligand docking"
+validation:
+  dry_run_command: "python -m inference --help"
+safety_notes:
+  - "Docking poses are hypotheses and require validation."
+limitations:
+  - "Performance depends on model version, protein preparation, ligand protonation, and input quality."
+

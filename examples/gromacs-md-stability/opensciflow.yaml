@@ -1,0 +1,52 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "gromacs-md-stability"
+version: "0.1.0"
+domain: ["molecular-dynamics", "computational-biology"]
+task_types: ["md-simulation", "trajectory-analysis", "protein-stability"]
+description: "Run or analyze GROMACS molecular dynamics trajectories and produce stability metrics."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "GROMACS license applies to GROMACS; manifest Apache-2.0"
+  model_weights: "not-applicable"
+  data: "user-provided"
+citation:
+  preferred: "Cite GROMACS according to official guidance."
+  url: "https://www.gromacs.org/"
+inputs:
+  - { name: "structure", type: "file", formats: ["pdb", "gro"], required: true }
+  - { name: "trajectory", type: "file", formats: ["xtc", "trr"], required: true }
+outputs:
+  - { name: "rmsd_xvg", type: "file", formats: ["xvg"], required: true }
+  - { name: "summary_report", type: "file", formats: ["md", "html"], required: true }
+environment:
+  conda:
+    channels: ["conda-forge", "bioconda"]
+    packages: ["gromacs", "python>=3.10", "pandas", "matplotlib"]
+hardware:
+  cpu_cores_min: 4
+  memory_gb_min: 8
+  gpu: "optional"
+model_weights:
+  required: false
+  sources: []
+execution:
+  local:
+    command: "gmx rms -s {inputs.structure} -f {inputs.trajectory} -o {outputs_dir}/rmsd.xvg"
+  slurm:
+    supported: true
+    recommended:
+      time: "01:00:00"
+      cpus_per_task: 8
+      mem: "16G"
+expected_runtime:
+  small_example: "1-10 min for analysis"
+examples:
+  - name: "short protein trajectory"
+validation:
+  dry_run_command: "gmx --version"
+safety_notes:
+  - "Do not treat stability metrics as binding-affinity proof."
+limitations:
+  - "Requires valid trajectory/topology and correct atom selections."
+
