@@ -129,6 +129,7 @@ Recommended flow:
 - `examples/gromacs-md-stability/opensciflow.yaml`
 - `examples/proteinflux-dynamics/opensciflow.yaml`
 - `examples/diffdock-docking/opensciflow.yaml`
+- `docs/diffdock-review-notes.md`
 - `docs/design-principles.md`
 - `docs/license-and-citation.md`
 - `docs/security-model.md`

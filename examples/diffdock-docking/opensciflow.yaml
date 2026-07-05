@@ -3,39 +3,69 @@ name: "diffdock-docking"
 version: "0.1.0"
 domain: ["molecular-docking", "drug-discovery"]
 task_types: ["protein-ligand-docking", "pose-prediction"]
-description: "Run DiffDock-style protein-ligand docking and collect predicted poses and confidence scores."
+description: "Run DiffDock or DiffDock-L protein-small-molecule docking and collect predicted poses, confidence scores, provenance, and execution metadata."
 authors:
   - name: "OpenSciFlow maintainers"
 license:
-  software: "DiffDock license applies; manifest Apache-2.0"
-  model_weights: "DiffDock model license applies"
+  software: "DiffDock code is MIT according to the upstream README; manifest Apache-2.0"
+  model_weights: "DiffDock model weights are MIT according to the upstream README"
   data: "user-provided"
 citation:
-  preferred: "Cite DiffDock according to the official repository/paper."
+  preferred: "Cite Corso et al. 2023 for DiffDock; cite Corso et al. 2024 as well when using DiffDock-L."
   url: "https://github.com/gcorso/DiffDock"
+  notes:
+    - "Upstream README says the repository now runs DiffDock-L by default."
 inputs:
-  - { name: "protein", type: "file", formats: ["pdb"], required: true }
-  - { name: "ligand", type: "file", formats: ["sdf", "mol2", "smiles"], required: true }
+  - name: "protein"
+    type: "file"
+    formats: ["pdb"]
+    required: false
+    description: "Protein structure file. Required unless protein_sequence or protein_ligand_csv is provided."
+  - name: "protein_sequence"
+    type: "string"
+    required: false
+    description: "Protein sequence for ESMFold-based structure prediction, if supported by the selected DiffDock setup."
+  - name: "ligand"
+    type: "file-or-string"
+    formats: ["sdf", "mol2", "smiles"]
+    required: false
+    description: "Ligand file readable by RDKit or a SMILES string. Required unless protein_ligand_csv is provided."
+  - name: "protein_ligand_csv"
+    type: "file"
+    formats: ["csv"]
+    required: false
+    description: "Batch input CSV with complex_name, protein_path, ligand_description, and protein_sequence columns."
 outputs:
   - { name: "poses", type: "directory", formats: ["sdf"], required: true }
-  - { name: "scores", type: "file", formats: ["csv"], required: true }
+  - { name: "confidence_scores", type: "file", formats: ["csv"], required: true }
+  - { name: "run_manifest", type: "file", formats: ["json"], required: true }
+  - { name: "execution_log", type: "file", formats: ["log", "txt"], required: true }
 environment:
   conda:
-    channels: ["conda-forge", "pytorch", "pyg"]
-    packages: ["python>=3.10", "pytorch", "rdkit"]
+    channels: ["conda-forge", "pytorch", "pyg", "nvidia"]
+    packages:
+      - "use upstream environment.yml when possible"
+      - "python"
+      - "pytorch"
+      - "rdkit"
+  docker:
+    image: "rbgcsail/diffdock"
+    build: "docker build . -f Dockerfile -t diffdock"
 hardware:
   cpu_cores_min: 4
   memory_gb_min: 16
-  gpu: "recommended"
+  gpu: "recommended; CPU is possible for PDB inputs but significantly slower"
 model_weights:
   required: true
   sources:
     - name: "DiffDock weights"
-      url: "see official repository"
+      url: "see official repository/runtime download behavior"
       checksum: "to-be-filled"
+      license: "MIT according to upstream README"
 execution:
   local:
-    command: "python -m inference --protein_path {inputs.protein} --ligand {inputs.ligand} --out_dir {outputs_dir}"
+    command: "python -m inference --config default_inference_args.yaml --protein_path {inputs.protein} --ligand {inputs.ligand} --out_dir {outputs_dir}"
+    batch_command: "python -m inference --config default_inference_args.yaml --protein_ligand_csv {inputs.protein_ligand_csv} --out_dir {outputs_dir}"
   slurm:
     supported: true
     recommended:
@@ -45,12 +75,27 @@ execution:
       gres: "gpu:1"
 expected_runtime:
   small_example: "5-30 min on GPU"
+  cpu_warning: "CPU execution can be significantly slower and should not be used as the default benchmark path."
 examples:
   - name: "single ligand docking"
+    inputs:
+      protein: "examples/inputs/protein.pdb"
+      ligand: "examples/inputs/ligand.sdf"
+    expected_outputs:
+      - "ranked poses as SDF files"
+      - "confidence scores"
 validation:
   dry_run_command: "python -m inference --help"
+  smoke_test:
+    command: "python -m inference --config default_inference_args.yaml --protein_ligand_csv data/protein_ligand_example.csv --out_dir test-output"
+    expected_files:
+      - "test-output"
 safety_notes:
   - "Docking poses are hypotheses and require validation."
+  - "DiffDock confidence scores are not binding affinities."
+  - "The model is designed for small-molecule docking to proteins, not general protein-protein or protein-nucleic-acid docking."
+  - "Protein preparation, ligand protonation, input conformation, and model version must be recorded."
 limitations:
   - "Performance depends on model version, protein preparation, ligand protonation, and input quality."
-
+  - "The upstream repository currently defaults to DiffDock-L; results should record the exact commit, config, and model version."
+  - "A workflow wrapper must not present predicted poses as validated binding or drug-discovery evidence."
