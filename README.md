@@ -135,6 +135,9 @@ Recommended flow:
 - `docs/diffdock-review-notes.md`
 - `docs/model-manifest-review-notes.md`
 - `docs/model-manifest-backlog.md`
+- `docs/protocol-roadmap.md`
+- `docs/readiness-levels.md`
+- `docs/agent-contract.md`
 - `docs/design-principles.md`
 - `docs/license-and-citation.md`
 - `docs/security-model.md`
