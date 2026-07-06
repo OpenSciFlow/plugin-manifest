@@ -1,0 +1,78 @@
+# HPC and Slurm metadata
+
+OpenSciFlow v0.1 should describe HPC execution requirements without pretending to replace Slurm, environment modules, site policies, or workflow engines.
+
+The goal is to make a local agent ask the right questions before submitting work to a cluster.
+
+## Manifest fields to review
+
+For a plugin that supports Slurm, the manifest should record:
+
+```yaml
+execution:
+  slurm:
+    supported: true
+    recommended:
+      partition:
+      account:
+      time:
+      nodes:
+      ntasks:
+      cpus_per_task:
+      mem:
+      gres:
+      constraint:
+      modules:
+        - 
+      environment_variables:
+        - name:
+          value_policy:
+      launcher:
+      notes:
+```
+
+Use `null` or omit site-specific values when they cannot be portable. Do not hard-code a private cluster account, username, or filesystem path.
+
+## Required review questions
+
+- Does the tool need MPI, OpenMP, CUDA, ROCm, oneAPI, or CPU-only execution?
+- Does it require environment modules before Conda, Apptainer, or Docker?
+- Is the recommended `time` based on a tiny smoke test, a typical run, or a large production run?
+- Are GPU requirements expressed as optional, required, or unsupported?
+- Does execution require shared filesystem paths?
+- Are temporary directories and output directories safe for cluster policy?
+- Are model weights or sample data expected to be staged before submission?
+- Can the dry run be executed on a login node, or must it run as a Slurm job?
+
+## Safety boundaries
+
+An OpenSciFlow-compatible agent should not:
+
+- submit a job without showing the rendered Slurm options to the user;
+- invent an account, partition, or module name;
+- submit jobs that download model weights without approval;
+- write outside the approved work directory;
+- treat Slurm submission success as scientific validation.
+
+## Run-record expectations
+
+When a workflow runs under Slurm, the run record should capture:
+
+- Slurm job id;
+- rendered `sbatch` options;
+- submitted script path;
+- stdout and stderr log paths;
+- exit status;
+- modules loaded;
+- container image or Conda environment;
+- node, GPU, CPU, memory, and walltime information when available.
+
+## First review targets
+
+Start with:
+
+- `gromacs-md-stability`
+- `mace-interatomic-potential`
+- `diffdock-docking`
+
+These cover CPU trajectory analysis, molecular simulation/HPC conventions, GPU inference, and model-weight staging.

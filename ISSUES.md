@@ -6,5 +6,6 @@
 4. Review ProteinFlux example against the manifest review checklist.
 5. Review DiffDock example against the manifest review checklist and upstream feedback if available.
 6. Expand command-rendering fixtures for optional inputs and wrapper-script cases.
-7. Draft a run-record JSON Schema shared with BioPilot.
-8. Convert at least one manifest from `R2` to `R3` using `docs/r3-evidence-template.md`.
+7. Review Slurm/HPC metadata using `docs/hpc-slurm-metadata.md`.
+8. Draft a run-record JSON Schema shared with BioPilot.
+9. Convert at least one manifest from `R2` to `R3` using `docs/r3-evidence-template.md`.

@@ -112,5 +112,6 @@ Non-negotiable requirements:
 3. Continue tightening JSON Schema for nested fields beyond input/output artifacts.
 4. Review command-template validation against wrapper-script and workflow-engine cases.
 5. Record reusable R3 dry-run evidence for at least one manifest.
-6. Align `R5` and `R6` readiness with the BioPilot run-record schema.
-7. Convert the BioPilot MVP into a protocol compliance test.
+6. Review Slurm/HPC metadata fields against real cluster workflows.
+7. Align `R5` and `R6` readiness with the BioPilot run-record schema.
+8. Convert the BioPilot MVP into a protocol compliance test.
