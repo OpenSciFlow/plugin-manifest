@@ -18,5 +18,13 @@
       "outputs_dir": "outputs/mace"
     },
     "expected": "mace_eval_configs --configs inputs/configs.xyz --model inputs/mace.model --output outputs/mace/evaluated_configs.xyz"
+  },
+  {
+    "name": "gromacs_slurm_submit_command",
+    "template": "sbatch {run_directory}/job.sbatch",
+    "values": {
+      "run_directory": "runs/gromacs-rmsd-slurm-001"
+    },
+    "expected": "sbatch runs/gromacs-rmsd-slurm-001/job.sbatch"
   }
 ]

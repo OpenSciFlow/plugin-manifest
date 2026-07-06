@@ -11,7 +11,8 @@ Command templates may reference:
 - `{inputs.<name>}` for declared input names;
 - `{outputs.<name>}` for declared output names;
 - `{parameters.<name>}` for declared parameter names, when a manifest defines parameters;
-- `{outputs_dir}` for the runner-managed output directory.
+- `{outputs_dir}` for the runner-managed output directory;
+- `{run_directory}` for the runner-managed run directory, especially for reviewed wrapper submissions.
 
 Examples:
 
@@ -57,3 +58,11 @@ If a command needs pipes, redirects, environment mutation, network access, or a 
 - document it as a future protocol-change proposal.
 
 Do not hide complex shell behavior inside one manifest command string.
+
+Reviewed wrapper submissions should keep the manifest command simple, for example:
+
+```text
+sbatch {run_directory}/job.sbatch
+```
+
+The wrapper itself must carry separate review metadata and should be rendered into the approved run directory before submission.

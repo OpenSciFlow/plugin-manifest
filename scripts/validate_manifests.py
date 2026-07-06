@@ -46,7 +46,7 @@ def validate_command_templates(data: dict) -> list[str]:
     inputs = declared_names(data.get("inputs"))
     outputs = declared_names(data.get("outputs"))
     parameters = declared_names(data.get("parameters"))
-    allowed_literals = {"outputs_dir"}
+    allowed_literals = {"outputs_dir", "run_directory"}
 
     templates = command_templates(data)
     local_templates = [path for path, _ in templates if path.startswith("execution.local.")]

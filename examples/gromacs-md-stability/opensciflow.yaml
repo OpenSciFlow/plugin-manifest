@@ -35,7 +35,15 @@ execution:
     command: "gmx rms -s {inputs.structure} -f {inputs.trajectory} -o {outputs_dir}/rmsd.xvg"
   slurm:
     supported: true
+    submit_command: "sbatch {run_directory}/job.sbatch"
+    reviewed_wrapper:
+      path: "wrappers/gromacs-rmsd.sbatch"
+      review_status: "reviewed"
+      reviewed_by: "OpenSciFlow maintainers"
+      allowed_arguments: ["run_directory", "account", "partition", "time", "cpus_per_task", "mem"]
     recommended:
+      partition: null
+      account: null
       time: "01:00:00"
       cpus_per_task: 8
       mem: "16G"
@@ -49,4 +57,3 @@ safety_notes:
   - "Do not treat stability metrics as binding-affinity proof."
 limitations:
   - "Requires valid trajectory/topology and correct atom selections."
-

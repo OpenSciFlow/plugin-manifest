@@ -12,6 +12,18 @@ For a plugin that supports Slurm, the manifest should record:
 execution:
   slurm:
     supported: true
+    submit_command: "sbatch {run_directory}/job.sbatch"
+    reviewed_wrapper:
+      path:
+      review_status:
+      reviewed_by:
+      allowed_arguments:
+        - run_directory
+        - account
+        - partition
+        - time
+        - cpus_per_task
+        - mem
     recommended:
       partition:
       account:
@@ -43,6 +55,7 @@ Use `null` or omit site-specific values when they cannot be portable. Do not har
 - Are temporary directories and output directories safe for cluster policy?
 - Are model weights or sample data expected to be staged before submission?
 - Can the dry run be executed on a login node, or must it run as a Slurm job?
+- Is the Slurm wrapper reviewed, and are its fillable arguments explicitly listed?
 
 ## Safety boundaries
 
@@ -50,6 +63,7 @@ An OpenSciFlow-compatible agent should not:
 
 - submit a job without showing the rendered Slurm options to the user;
 - invent an account, partition, or module name;
+- run a wrapper script that is not declared and reviewed in the manifest;
 - submit jobs that download model weights without approval;
 - write outside the approved work directory;
 - treat Slurm submission success as scientific validation.
