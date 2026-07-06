@@ -1,0 +1,22 @@
+[
+  {
+    "name": "mdanalysis_local_command",
+    "template": "python analyze_md_stability.py --topology {inputs.topology} --trajectory {inputs.trajectory} --out {outputs_dir}",
+    "values": {
+      "inputs.topology": "inputs/adk_topology.pdb",
+      "inputs.trajectory": "inputs/adk_trajectory.xtc",
+      "outputs_dir": "outputs/md-stability"
+    },
+    "expected": "python analyze_md_stability.py --topology inputs/adk_topology.pdb --trajectory inputs/adk_trajectory.xtc --out outputs/md-stability"
+  },
+  {
+    "name": "mace_output_path",
+    "template": "mace_eval_configs --configs {inputs.configs_xyz} --model {inputs.model_file} --output {outputs_dir}/evaluated_configs.xyz",
+    "values": {
+      "inputs.configs_xyz": "inputs/configs.xyz",
+      "inputs.model_file": "inputs/mace.model",
+      "outputs_dir": "outputs/mace"
+    },
+    "expected": "mace_eval_configs --configs inputs/configs.xyz --model inputs/mace.model --output outputs/mace/evaluated_configs.xyz"
+  }
+]

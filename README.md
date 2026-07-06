@@ -163,6 +163,7 @@ Recommended flow:
 - `docs/design-principles.md`
 - `docs/license-and-citation.md`
 - `docs/security-model.md`
+- `tests/command-rendering-fixtures.json`
 - `ISSUES.md`
 - `MILESTONES.md`
 

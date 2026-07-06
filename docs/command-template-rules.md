@@ -36,6 +36,18 @@ Example manifests should not use shell composition fragments such as:
 
 This does not mean real scientific workflows never need composition. It means OpenSciFlow v0.1 examples should keep execution boundaries inspectable until command rendering has a stricter security model.
 
+## Rendering fixture
+
+The repository includes a minimal rendering fixture:
+
+```text
+tests/command-rendering-fixtures.json
+```
+
+The validator renders each fixture by replacing allowed placeholders with declared values and comparing the result with the expected command string. This does not execute the command.
+
+The fixture is meant to catch protocol regressions before a local agent depends on command rendering.
+
 ## Review rule
 
 If a command needs pipes, redirects, environment mutation, network access, or a launcher script, prefer one of these:

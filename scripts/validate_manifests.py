@@ -11,6 +11,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schema" / "opensciflow-plugin.schema.json"
 EXAMPLES_DIR = ROOT / "examples"
+COMMAND_FIXTURES_PATH = ROOT / "tests" / "command-rendering-fixtures.json"
 PLACEHOLDER_RE = re.compile(r"{([^{}]+)}")
 DANGEROUS_SHELL_FRAGMENTS = ("&&", "||", ";", "`", "$(", "\n", "\r")
 
@@ -80,6 +81,77 @@ def validate_command_templates(data: dict) -> list[str]:
     return errors
 
 
+def render_command_template(template: str, values: dict[str, str]) -> str:
+    missing: list[str] = []
+    invalid: list[str] = []
+
+    def replace(match: re.Match[str]) -> str:
+        placeholder = match.group(1)
+        value = values.get(placeholder)
+        if value is None:
+            missing.append(placeholder)
+            return match.group(0)
+        if not isinstance(value, str) or not value:
+            invalid.append(placeholder)
+            return match.group(0)
+        return value
+
+    rendered = PLACEHOLDER_RE.sub(replace, template)
+
+    if missing:
+        raise ValueError(f"missing values for placeholders: {', '.join(sorted(set(missing)))}")
+    if invalid:
+        raise ValueError(f"invalid values for placeholders: {', '.join(sorted(set(invalid)))}")
+
+    return rendered
+
+
+def validate_command_rendering_fixtures() -> list[str]:
+    errors: list[str] = []
+
+    if not COMMAND_FIXTURES_PATH.exists():
+        return errors
+
+    fixtures = json.loads(COMMAND_FIXTURES_PATH.read_text(encoding="utf-8"))
+    if not isinstance(fixtures, list):
+        return ["tests/command-rendering-fixtures.json must contain a list"]
+
+    for index, fixture in enumerate(fixtures):
+        if not isinstance(fixture, dict):
+            errors.append(f"command fixture {index} must be an object")
+            continue
+
+        name = fixture.get("name", f"fixture[{index}]")
+        template = fixture.get("template")
+        values = fixture.get("values")
+        expected = fixture.get("expected")
+
+        if not isinstance(template, str) or not template:
+            errors.append(f"{name}: template must be a non-empty string")
+            continue
+        if not isinstance(values, dict):
+            errors.append(f"{name}: values must be an object")
+            continue
+        if not isinstance(expected, str) or not expected:
+            errors.append(f"{name}: expected must be a non-empty string")
+            continue
+
+        try:
+            rendered = render_command_template(template, values)
+        except ValueError as exc:
+            errors.append(f"{name}: {exc}")
+            continue
+
+        if rendered != expected:
+            errors.append(f"{name}: rendered command does not match expected output")
+
+        for fragment in DANGEROUS_SHELL_FRAGMENTS:
+            if fragment in rendered:
+                errors.append(f"{name}: rendered command contains disallowed shell fragment {fragment!r}")
+
+    return errors
+
+
 def main() -> None:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     files = sorted(EXAMPLES_DIR.glob("*/opensciflow.yaml"))
@@ -95,6 +167,8 @@ def main() -> None:
                 errors.append(f"{path.relative_to(ROOT)}: {error}")
         except Exception as exc:  # noqa: BLE001 - report all validation failures clearly.
             errors.append(f"{path.relative_to(ROOT)}: {exc}")
+
+    errors.extend(validate_command_rendering_fixtures())
 
     if errors:
         raise SystemExit("\n".join(errors))

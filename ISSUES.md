@@ -5,6 +5,6 @@
 3. Review GROMACS example against the manifest review checklist.
 4. Review ProteinFlux example against the manifest review checklist.
 5. Review DiffDock example against the manifest review checklist and upstream feedback if available.
-6. Review command-template placeholder validation against future wrapper-script cases.
+6. Expand command-rendering fixtures for optional inputs and wrapper-script cases.
 7. Draft a run-record JSON Schema shared with BioPilot.
 8. Convert at least one manifest from `R2` to `R3` using `docs/r3-evidence-template.md`.
