@@ -1,0 +1,40 @@
+name: Protocol change
+description: Propose a field, rule, or validation change for the plugin manifest protocol.
+title: "[protocol] "
+labels: ["protocol"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What concrete review or execution problem does this change solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed field or rule
+      description: Describe the exact field, rule, or validation behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal example
+      description: Add a small YAML snippet if possible.
+      render: yaml
+  - type: textarea
+    id: agent-impact
+    attributes:
+      label: Local agent impact
+      description: What should a local agent do differently?
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility
+      description: Does this break existing manifests?
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      description: What could go wrong if this is added or misused?

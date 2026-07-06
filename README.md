@@ -109,6 +109,18 @@ limitations:
 6. Smoke test: tiny example input produces expected files.
 7. Reproducibility check: input hashes, command, environment, tool versions, and output hashes are recorded.
 
+## Review process
+
+Use `docs/manifest-review-checklist.md` before moving a manifest beyond schema validation.
+
+The short rule is:
+
+```text
+Famous project is not enough. A manifest advances only when the required evidence exists.
+```
+
+For protocol-level changes, use `docs/protocol-change-process.md`.
+
 ## Installation policy
 
 v0.1 should not auto-install arbitrary code without explicit user approval.
@@ -135,6 +147,8 @@ Recommended flow:
 - `docs/diffdock-review-notes.md`
 - `docs/model-manifest-review-notes.md`
 - `docs/model-manifest-backlog.md`
+- `docs/manifest-review-checklist.md`
+- `docs/protocol-change-process.md`
 - `docs/protocol-roadmap.md`
 - `docs/readiness-levels.md`
 - `docs/agent-contract.md`

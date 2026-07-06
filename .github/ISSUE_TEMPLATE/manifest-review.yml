@@ -1,0 +1,57 @@
+name: Manifest review
+description: Review or correct an OpenSciFlow plugin manifest.
+title: "[manifest review] "
+labels: ["manifest-review"]
+body:
+  - type: input
+    id: manifest
+    attributes:
+      label: Manifest
+      description: Path or link to the manifest being reviewed.
+      placeholder: examples/mdanalysis-trajectory-analysis/opensciflow.yaml
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Suggested review outcome
+      options:
+        - needs-scope
+        - needs-metadata
+        - schema-ready
+        - metadata-reviewed
+        - dry-run-ready
+        - smoke-test-ready
+        - not sure
+    validations:
+      required: true
+  - type: textarea
+    id: corrections
+    attributes:
+      label: Corrections
+      description: What is inaccurate, missing, unsafe, or too vague?
+    validations:
+      required: true
+  - type: textarea
+    id: upstream
+    attributes:
+      label: Upstream evidence
+      description: Link to upstream docs, README, release notes, paper, license, or model card if relevant.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Review areas checked
+      options:
+        - label: Scope and unsupported uses
+        - label: Inputs and outputs
+        - label: Environment and hardware
+        - label: Model weights or datasets
+        - label: Command templates
+        - label: License and citation
+        - label: Safety notes and limitations
+        - label: Readiness level
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Any remaining uncertainty or follow-up question.
