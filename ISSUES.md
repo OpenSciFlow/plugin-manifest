@@ -1,7 +1,7 @@
 # First issues
 
 1. Review required vs optional fields for v0.1 against real manifests.
-2. Add stricter JSON Schema definitions for inputs, outputs, model weights, and command templates.
+2. Add stricter JSON Schema definitions for model weights, hardware, and validation evidence.
 3. Review GROMACS example against the manifest review checklist.
 4. Review ProteinFlux example against the manifest review checklist.
 5. Review DiffDock example against the manifest review checklist and upstream feedback if available.

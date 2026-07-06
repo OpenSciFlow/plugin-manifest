@@ -11,20 +11,36 @@
     "domain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "task_types": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "description": { "type": "string" },
-    "authors": { "type": "array", "items": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "url": { "type": ["string", "null"] }, "email": { "type": ["string", "null"] } } } },
+    "authors": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "url": { "type": ["string", "null"] }, "email": { "type": ["string", "null"] } } } },
     "license": { "type": "object" },
     "citation": { "type": "object", "required": ["preferred"] },
-    "inputs": { "type": "array" },
-    "outputs": { "type": "array" },
+    "inputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/io_artifact" } },
+    "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/io_artifact" } },
     "environment": { "type": "object" },
     "hardware": { "type": "object" },
     "model_weights": { "type": "object" },
-    "execution": { "type": "object" },
+    "execution": { "type": "object", "required": ["local"], "properties": { "local": { "type": "object", "minProperties": 1 }, "slurm": { "type": "object" } } },
     "expected_runtime": { "type": "object" },
     "examples": { "type": "array" },
     "validation": { "type": "object" },
     "safety_notes": { "type": "array", "items": { "type": "string" } },
     "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "io_artifact": {
+      "type": "object",
+      "required": ["name", "type", "required"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$" },
+        "type": {
+          "type": "string",
+          "enum": ["file", "directory", "file-or-directory", "file-or-string", "string", "number", "integer", "boolean", "object"]
+        },
+        "formats": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
   }
 }
-
