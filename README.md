@@ -134,6 +134,7 @@ Recommended flow:
 - `examples/mace-interatomic-potential/opensciflow.yaml`
 - `docs/diffdock-review-notes.md`
 - `docs/model-manifest-review-notes.md`
+- `docs/model-manifest-backlog.md`
 - `docs/design-principles.md`
 - `docs/license-and-citation.md`
 - `docs/security-model.md`
