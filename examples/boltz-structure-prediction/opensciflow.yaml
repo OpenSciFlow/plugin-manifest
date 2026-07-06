@@ -1,0 +1,92 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "boltz-structure-prediction"
+version: "0.1.0"
+domain: ["structural-biology", "biomolecular-interactions", "protein-ai"]
+task_types: ["structure-prediction", "complex-prediction", "affinity-prediction"]
+description: "Run Boltz biomolecular interaction prediction and collect structures, confidence outputs, optional affinity outputs, logs, citations, and provenance."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "Boltz code is MIT according to the upstream README; manifest Apache-2.0"
+  model_weights: "Boltz model weights are MIT according to the upstream README"
+  data: "user-provided"
+citation:
+  preferred: "Cite Boltz-1 and/or Boltz-2 according to the upstream README; cite ColabFold when using automatic MSA generation."
+  url: "https://github.com/jwohlwend/boltz"
+inputs:
+  - name: "input_yaml"
+    type: "file"
+    formats: ["yaml", "yml"]
+    required: true
+    description: "Boltz input YAML describing sequences, ligands, templates, constraints, and optional affinity properties."
+  - name: "msa_files"
+    type: "file-or-directory"
+    formats: ["a3m", "csv"]
+    required: false
+    description: "Precomputed MSA files. If omitted, --use_msa_server may generate MSA remotely."
+outputs:
+  - { name: "predicted_structures", type: "directory", formats: ["cif", "pdb"], required: true }
+  - { name: "confidence_json", type: "file", formats: ["json"], required: true }
+  - { name: "affinity_json", type: "file", formats: ["json"], required: false }
+  - { name: "processed_inputs", type: "directory", formats: ["yaml", "npz", "json"], required: false }
+  - { name: "run_manifest", type: "file", formats: ["json"], required: true }
+  - { name: "execution_log", type: "file", formats: ["log", "txt"], required: true }
+environment:
+  pip:
+    packages:
+      - "boltz[cuda]"
+  conda:
+    channels: ["conda-forge", "pytorch", "nvidia"]
+    packages:
+      - "python>=3.10"
+      - "pytorch"
+      - "pip"
+  docker:
+    image: "to-be-reviewed"
+hardware:
+  cpu_cores_min: 4
+  memory_gb_min: 16
+  gpu: "recommended; CPU or non-CUDA execution is possible but significantly slower"
+model_weights:
+  required: true
+  sources:
+    - name: "Boltz default model"
+      url: "downloaded by Boltz runtime/cache unless a checkpoint is provided"
+      checksum: "to-be-filled"
+      license: "MIT according to upstream README"
+execution:
+  local:
+    command: "boltz predict {inputs.input_yaml} --out_dir {outputs_dir}"
+    command_with_msa_server: "boltz predict {inputs.input_yaml} --out_dir {outputs_dir} --use_msa_server"
+  slurm:
+    supported: true
+    recommended:
+      time: "02:00:00"
+      cpus_per_task: 4
+      mem: "32G"
+      gres: "gpu:1"
+expected_runtime:
+  small_example: "5-60 min on GPU depending on input size and MSA generation"
+  cpu_warning: "CPU execution should not be used as the default benchmark path."
+examples:
+  - name: "single biomolecular complex YAML"
+    inputs:
+      input_yaml: "examples/inputs/complex.yaml"
+    expected_outputs:
+      - "predictions/{input_name}/{input_name}_model_0.cif"
+      - "predictions/{input_name}/confidence_{input_name}_model_0.json"
+validation:
+  dry_run_command: "boltz predict --help"
+  smoke_test:
+    command: "boltz predict examples/inputs/complex.yaml --out_dir test-output"
+    expected_files:
+      - "test-output/predictions"
+safety_notes:
+  - "Predicted structures and affinity outputs are model predictions, not experimental validation."
+  - "Automatic MSA generation may contact a remote MSA server; this must be shown before execution."
+  - "Affinity outputs have context-specific interpretation and should not be converted into drug-efficacy claims."
+  - "The exact model version, checkpoint, cache path, MSA source, and input YAML must be recorded."
+limitations:
+  - "Results depend on input formulation, MSA quality, templates, ligand representation, and model version."
+  - "Affinity prediction support is constrained by target and ligand assumptions described upstream."
+  - "This manifest is a draft and needs upstream review before being treated as stable."

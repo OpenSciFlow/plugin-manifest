@@ -1,0 +1,95 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "proteinmpnn-sequence-design"
+version: "0.1.0"
+domain: ["protein-design", "structural-biology", "protein-ai"]
+task_types: ["sequence-design", "backbone-conditioned-design", "sequence-scoring"]
+description: "Run ProteinMPNN sequence design or scoring from protein backbones and collect designed FASTA sequences, scores, logs, citations, and provenance."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "ProteinMPNN repository license is MIT according to GitHub metadata; manifest Apache-2.0"
+  model_weights: "ProteinMPNN model-weight license should be confirmed before execution"
+  data: "user-provided"
+citation:
+  preferred: "Cite Dauparas et al. 2022 according to the upstream README."
+  url: "https://github.com/dauparas/ProteinMPNN"
+inputs:
+  - name: "backbone_pdb"
+    type: "file"
+    formats: ["pdb"]
+    required: true
+    description: "Protein backbone PDB for sequence design or scoring."
+  - name: "designed_chains"
+    type: "string"
+    required: false
+    description: "Chains to design, corresponding to ProteinMPNN --pdb_path_chains."
+  - name: "fixed_positions_jsonl"
+    type: "file"
+    formats: ["jsonl"]
+    required: false
+    description: "Optional fixed-position constraints."
+  - name: "path_to_fasta"
+    type: "file"
+    formats: ["fasta", "fa"]
+    required: false
+    description: "Optional sequence input for score-only mode."
+outputs:
+  - { name: "designed_sequences", type: "file", formats: ["fa", "fasta"], required: true }
+  - { name: "scores", type: "file", formats: ["npy", "json", "csv"], required: false }
+  - { name: "probabilities", type: "file", formats: ["npy"], required: false }
+  - { name: "run_manifest", type: "file", formats: ["json"], required: true }
+  - { name: "execution_log", type: "file", formats: ["log", "txt"], required: true }
+environment:
+  conda:
+    channels: ["conda-forge", "pytorch"]
+    packages:
+      - "python>=3.8"
+      - "pytorch"
+      - "numpy"
+  docker:
+    image: "to-be-reviewed"
+hardware:
+  cpu_cores_min: 2
+  memory_gb_min: 8
+  gpu: "recommended for larger batches; CPU may be acceptable for small examples"
+model_weights:
+  required: true
+  sources:
+    - name: "ProteinMPNN backbone model weights"
+      url: "included or referenced by upstream repository; exact file/version must be recorded"
+      checksum: "to-be-filled"
+      license: "to-be-confirmed"
+execution:
+  local:
+    command: "python protein_mpnn_run.py --pdb_path {inputs.backbone_pdb} --pdb_path_chains {inputs.designed_chains} --out_folder {outputs_dir} --num_seq_per_target 1 --sampling_temp 0.1"
+    score_only_command: "python protein_mpnn_run.py --pdb_path {inputs.backbone_pdb} --path_to_fasta {inputs.path_to_fasta} --out_folder {outputs_dir} --score_only 1"
+  slurm:
+    supported: true
+    recommended:
+      time: "00:30:00"
+      cpus_per_task: 2
+      mem: "8G"
+      gres: "gpu:1"
+expected_runtime:
+  small_example: "1-10 min depending on backbone size and number of sampled sequences"
+examples:
+  - name: "single backbone sequence design"
+    inputs:
+      backbone_pdb: "examples/inputs/backbone.pdb"
+      designed_chains: "A"
+    expected_outputs:
+      - "seqs/*.fa"
+validation:
+  dry_run_command: "python protein_mpnn_run.py --help"
+  smoke_test:
+    command: "python protein_mpnn_run.py --pdb_path examples/inputs/backbone.pdb --pdb_path_chains A --out_folder test-output --num_seq_per_target 1"
+    expected_files:
+      - "test-output/seqs"
+safety_notes:
+  - "Designed sequences are hypotheses and require structural, functional, and experimental validation."
+  - "Scores are model-derived design metrics, not proof of folding, activity, binding, safety, or expression."
+  - "Record random seed, model name, sampling temperature, designed chains, and fixed-position constraints."
+limitations:
+  - "Outputs depend on backbone quality, chain selection, sampling temperature, constraints, and selected model weights."
+  - "This plugin does not validate whether designed sequences are experimentally viable."
+  - "This manifest is a draft and needs upstream review before being treated as stable."

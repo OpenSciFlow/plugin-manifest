@@ -1,0 +1,92 @@
+schema_version: "opensciflow.plugin/v0.1"
+name: "mace-interatomic-potential"
+version: "0.1.0"
+domain: ["materials-science", "atomistic-simulation", "machine-learning-potentials"]
+task_types: ["interatomic-potential-inference", "energy-force-evaluation", "materials-modeling"]
+description: "Run MACE machine-learning interatomic potential inference/evaluation and collect energies, forces, model metadata, logs, citations, and provenance."
+authors:
+  - name: "OpenSciFlow maintainers"
+license:
+  software: "MACE code is MIT according to upstream README; manifest Apache-2.0"
+  model_weights: "varies by foundation model; record per-model license before execution"
+  data: "user-provided"
+citation:
+  preferred: "Cite MACE papers and the selected foundation model according to upstream guidance."
+  url: "https://github.com/ACEsuit/mace"
+inputs:
+  - name: "configs_xyz"
+    type: "file"
+    formats: ["xyz", "extxyz"]
+    required: true
+    description: "Atomic configurations for evaluation."
+  - name: "model_file"
+    type: "file"
+    formats: ["model", "pt"]
+    required: false
+    description: "Specific MACE model file. If omitted, a named foundation model may be used by wrapper policy."
+  - name: "device"
+    type: "string"
+    required: false
+    description: "Execution device such as cpu, cuda, or mps."
+outputs:
+  - { name: "evaluated_configs", type: "file", formats: ["xyz", "extxyz"], required: true }
+  - { name: "metrics", type: "file", formats: ["csv", "json"], required: false }
+  - { name: "run_manifest", type: "file", formats: ["json"], required: true }
+  - { name: "execution_log", type: "file", formats: ["log", "txt"], required: true }
+environment:
+  pip:
+    packages:
+      - "mace-torch"
+  conda:
+    channels: ["conda-forge", "pytorch", "nvidia"]
+    packages:
+      - "python>=3.9"
+      - "pytorch"
+      - "ase"
+      - "pip"
+  docker:
+    image: "to-be-reviewed"
+hardware:
+  cpu_cores_min: 2
+  memory_gb_min: 8
+  gpu: "optional; CUDA can accelerate inference/training"
+model_weights:
+  required: true
+  sources:
+    - name: "MACE foundation or user-provided model"
+      url: "record exact model URL or local path"
+      checksum: "to-be-filled"
+      license: "record per selected model; upstream README lists different licenses across models"
+execution:
+  local:
+    command: "mace_eval_configs --configs {inputs.configs_xyz} --model {inputs.model_file} --output {outputs_dir}/evaluated_configs.xyz"
+  slurm:
+    supported: true
+    recommended:
+      time: "01:00:00"
+      cpus_per_task: 4
+      mem: "16G"
+      gres: "gpu:1"
+expected_runtime:
+  small_example: "1-10 min depending on number of atoms/configurations and device"
+examples:
+  - name: "evaluate configurations with a selected MACE model"
+    inputs:
+      configs_xyz: "examples/inputs/configs.xyz"
+      model_file: "examples/inputs/mace.model"
+    expected_outputs:
+      - "evaluated_configs.xyz"
+validation:
+  dry_run_command: "mace_eval_configs --help"
+  smoke_test:
+    command: "mace_eval_configs --configs examples/inputs/configs.xyz --model examples/inputs/mace.model --output test-output/evaluated_configs.xyz"
+    expected_files:
+      - "test-output/evaluated_configs.xyz"
+safety_notes:
+  - "MACE predictions are valid only within the selected model's training domain and applicability limits."
+  - "Foundation model license, training dataset, element coverage, and level of theory must be shown before execution."
+  - "Do not treat model energies/forces as universal ground truth without validation against the intended system."
+limitations:
+  - "Accuracy depends on chemistry domain, element coverage, configuration distribution, model version, and device precision."
+  - "Some pretrained models listed upstream have licenses different from the MACE code license."
+  - "This manifest is a draft and needs upstream review before being treated as stable."

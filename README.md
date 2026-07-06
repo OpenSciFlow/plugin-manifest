@@ -129,6 +129,9 @@ Recommended flow:
 - `examples/gromacs-md-stability/opensciflow.yaml`
 - `examples/proteinflux-dynamics/opensciflow.yaml`
 - `examples/diffdock-docking/opensciflow.yaml`
+- `examples/boltz-structure-prediction/opensciflow.yaml`
+- `examples/proteinmpnn-sequence-design/opensciflow.yaml`
+- `examples/mace-interatomic-potential/opensciflow.yaml`
 - `docs/diffdock-review-notes.md`
 - `docs/design-principles.md`
 - `docs/license-and-citation.md`
