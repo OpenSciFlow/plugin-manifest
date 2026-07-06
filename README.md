@@ -133,6 +133,7 @@ Recommended flow:
 - `examples/proteinmpnn-sequence-design/opensciflow.yaml`
 - `examples/mace-interatomic-potential/opensciflow.yaml`
 - `docs/diffdock-review-notes.md`
+- `docs/model-manifest-review-notes.md`
 - `docs/design-principles.md`
 - `docs/license-and-citation.md`
 - `docs/security-model.md`
