@@ -71,6 +71,7 @@ They do not certify scientific correctness.
   - citations;
   - limitations;
   - timestamps.
+- The run record should validate against the current BioPilot run-record schema when used by the reference prototype.
 
 ### R6
 

@@ -111,5 +111,5 @@ Non-negotiable requirements:
 2. Define the agent execution contract.
 3. Tighten JSON Schema for nested fields.
 4. Add command-template validation.
-5. Add run-record schema.
+5. Align `R5` and `R6` readiness with the BioPilot run-record schema.
 6. Convert the BioPilot MVP into a protocol compliance test.
