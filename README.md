@@ -121,6 +121,10 @@ Famous project is not enough. A manifest advances only when the required evidenc
 
 For protocol-level changes, use `docs/protocol-change-process.md`.
 
+Command template rules:
+
+- `docs/command-template-rules.md`
+
 ## Installation policy
 
 v0.1 should not auto-install arbitrary code without explicit user approval.
@@ -149,6 +153,7 @@ Recommended flow:
 - `docs/model-manifest-backlog.md`
 - `docs/manifest-review-checklist.md`
 - `docs/protocol-change-process.md`
+- `docs/command-template-rules.md`
 - `docs/protocol-roadmap.md`
 - `docs/readiness-levels.md`
 - `docs/agent-contract.md`
