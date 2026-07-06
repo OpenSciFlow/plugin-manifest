@@ -16,7 +16,8 @@ As of 2026-07-06:
 - Command-template placeholder validation passes.
 - License/citation fields are present but should still be checked against upstream guidance.
 - Dry-run command is declared.
-- No dry-run evidence has been committed yet.
+- One failed local dry-run attempt has been recorded in `dry-run-attempt-2026-07-06.md`.
+- No passing R3 dry-run evidence has been committed yet.
 
 ## Dry-run command
 

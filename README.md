@@ -143,6 +143,7 @@ Recommended flow:
 - `schema/opensciflow-plugin.schema.json`
 - `examples/mdanalysis-trajectory-analysis/opensciflow.yaml`
 - `examples/mdanalysis-trajectory-analysis/readiness.md`
+- `examples/mdanalysis-trajectory-analysis/dry-run-attempt-2026-07-06.md`
 - `examples/gromacs-md-stability/opensciflow.yaml`
 - `examples/proteinflux-dynamics/opensciflow.yaml`
 - `examples/diffdock-docking/opensciflow.yaml`
