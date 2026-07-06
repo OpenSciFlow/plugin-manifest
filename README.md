@@ -155,6 +155,7 @@ Recommended flow:
 - `docs/manifest-review-checklist.md`
 - `docs/protocol-change-process.md`
 - `docs/command-template-rules.md`
+- `docs/r3-evidence-template.md`
 - `docs/protocol-roadmap.md`
 - `docs/readiness-levels.md`
 - `docs/agent-contract.md`
