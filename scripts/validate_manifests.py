@@ -14,6 +14,28 @@ EXAMPLES_DIR = ROOT / "examples"
 COMMAND_FIXTURES_PATH = ROOT / "tests" / "command-rendering-fixtures.json"
 PLACEHOLDER_RE = re.compile(r"{([^{}]+)}")
 DANGEROUS_SHELL_FRAGMENTS = ("&&", "||", ";", "`", "$(", "\n", "\r")
+REQUIRED_TOP_LEVEL_FIELDS = (
+    "schema_version",
+    "name",
+    "version",
+    "domain",
+    "task_types",
+    "description",
+    "authors",
+    "license",
+    "citation",
+    "inputs",
+    "outputs",
+    "environment",
+    "hardware",
+    "model_weights",
+    "execution",
+    "expected_runtime",
+    "examples",
+    "validation",
+    "safety_notes",
+    "limitations",
+)
 
 
 def declared_names(items: object) -> set[str]:
@@ -156,6 +178,35 @@ def nonempty_string(value: object) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+def validate_schema_required_boundary(schema: dict) -> list[str]:
+    errors: list[str] = []
+
+    required = schema.get("required")
+    if not isinstance(required, list):
+        return ["schema.required must be a list"]
+
+    required_set = set(required)
+    expected_set = set(REQUIRED_TOP_LEVEL_FIELDS)
+
+    missing = sorted(expected_set - required_set)
+    extra = sorted(required_set - expected_set)
+
+    if missing:
+        errors.append(f"schema.required is missing required protocol fields: {', '.join(missing)}")
+    if extra:
+        errors.append(f"schema.required includes undocumented fields: {', '.join(extra)}")
+
+    properties = schema.get("properties")
+    if not isinstance(properties, dict):
+        return errors + ["schema.properties must be an object"]
+
+    for field in REQUIRED_TOP_LEVEL_FIELDS:
+        if field not in properties:
+            errors.append(f"schema.properties is missing required field definition: {field}")
+
+    return errors
+
+
 def validate_license_and_citation(data: dict) -> list[str]:
     errors: list[str] = []
 
@@ -204,7 +255,7 @@ def main() -> None:
     if not files:
         raise SystemExit("No plugin examples found")
 
-    errors: list[str] = []
+    errors: list[str] = validate_schema_required_boundary(schema)
     for path in files:
         try:
             data = yaml.safe_load(path.read_text(encoding="utf-8"))

@@ -117,6 +117,12 @@ Short version:
 - V6: run-record validation.
 - V7: workflow validation.
 
+Required and optional manifest fields are documented in:
+
+```text
+docs/required-vs-optional-fields.md
+```
+
 ## Review process
 
 Use `docs/manifest-review-checklist.md` before moving a manifest beyond schema validation.
@@ -165,6 +171,7 @@ Recommended flow:
 - `docs/protocol-change-process.md`
 - `docs/command-template-rules.md`
 - `docs/hpc-slurm-metadata.md`
+- `docs/required-vs-optional-fields.md`
 - `docs/r3-evidence-template.md`
 - `docs/validation-levels.md`
 - `docs/protocol-roadmap.md`

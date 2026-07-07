@@ -3,30 +3,136 @@
   "$id": "https://opensciflow.org/schemas/opensciflow-plugin-v0.1.schema.json",
   "title": "OpenSciFlow Plugin Manifest v0.1",
   "type": "object",
-  "required": ["schema_version", "name", "version", "domain", "task_types", "description", "authors", "license", "citation", "inputs", "outputs", "environment", "execution", "examples", "validation", "limitations"],
+  "required": [
+    "schema_version",
+    "name",
+    "version",
+    "domain",
+    "task_types",
+    "description",
+    "authors",
+    "license",
+    "citation",
+    "inputs",
+    "outputs",
+    "environment",
+    "hardware",
+    "model_weights",
+    "execution",
+    "expected_runtime",
+    "examples",
+    "validation",
+    "safety_notes",
+    "limitations"
+  ],
   "properties": {
     "schema_version": { "const": "opensciflow.plugin/v0.1" },
     "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
-    "version": { "type": "string" },
+    "version": { "type": "string", "minLength": 1 },
     "domain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "task_types": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "description": { "type": "string" },
-    "authors": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" }, "url": { "type": ["string", "null"] }, "email": { "type": ["string", "null"] } } } },
-    "license": { "type": "object" },
-    "citation": { "type": "object", "required": ["preferred"] },
+    "description": { "type": "string", "minLength": 1 },
+    "authors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "url": { "type": ["string", "null"] },
+          "email": { "type": ["string", "null"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "license": {
+      "type": "object",
+      "required": ["software", "model_weights", "data"],
+      "properties": {
+        "software": { "type": "string", "minLength": 1 },
+        "model_weights": { "type": "string", "minLength": 1 },
+        "data": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "citation": {
+      "type": "object",
+      "required": ["preferred"],
+      "properties": {
+        "preferred": { "type": "string", "minLength": 1 },
+        "url": { "type": ["string", "null"] },
+        "doi": { "type": ["string", "null"] },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
     "inputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/io_artifact" } },
     "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/io_artifact" } },
-    "environment": { "type": "object" },
-    "hardware": { "type": "object" },
-    "model_weights": { "type": "object" },
-    "execution": { "type": "object", "required": ["local"], "properties": { "local": { "type": "object", "minProperties": 1 }, "slurm": { "type": "object" } } },
-    "expected_runtime": { "type": "object" },
-    "examples": { "type": "array" },
-    "validation": { "type": "object" },
-    "safety_notes": { "type": "array", "items": { "type": "string" } },
-    "limitations": { "type": "array", "items": { "type": "string" } }
+    "environment": { "type": "object", "minProperties": 1 },
+    "hardware": {
+      "type": "object",
+      "required": ["cpu_cores_min", "memory_gb_min", "gpu"],
+      "properties": {
+        "cpu_cores_min": { "type": "integer", "minimum": 1 },
+        "memory_gb_min": { "type": "number", "minimum": 0 },
+        "gpu": { "type": ["boolean", "string"] }
+      },
+      "additionalProperties": true
+    },
+    "model_weights": {
+      "type": "object",
+      "required": ["required", "sources"],
+      "properties": {
+        "required": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "string", "enum": ["optional", "not-applicable", "unknown"] }
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/model_weight_source" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "execution": {
+      "type": "object",
+      "required": ["local"],
+      "properties": {
+        "local": { "type": "object", "minProperties": 1 },
+        "slurm": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "expected_runtime": { "type": "object", "minProperties": 1 },
+    "examples": { "type": "array", "minItems": 1 },
+    "validation": {
+      "type": "object",
+      "required": ["dry_run_command"],
+      "properties": {
+        "dry_run_command": { "type": "string", "minLength": 1 },
+        "smoke_test": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "safety_notes": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "limitations": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
   },
   "$defs": {
+    "model_weight_source": {
+      "type": "object",
+      "required": ["name", "url", "checksum"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "minLength": 1 },
+        "checksum": { "type": "string", "minLength": 1 },
+        "license": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
     "io_artifact": {
       "type": "object",
       "required": ["name", "type", "required"],

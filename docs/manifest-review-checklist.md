@@ -30,6 +30,7 @@ Use one of these outcomes:
 - Are upstream installation instructions linked or summarized accurately?
 - Are release/version assumptions visible?
 - If the manifest was written by OpenSciFlow maintainers, is it marked as a draft?
+- Are placeholder values such as `to-be-filled`, `to-be-reviewed`, or `to-be-confirmed` treated as review warnings rather than silent approval?
 
 ## 3. Inputs and outputs
 
@@ -86,3 +87,10 @@ Map the manifest to the lowest valid readiness level:
 - `R6` if the manifest is used inside a tested workflow template.
 
 Do not advance a manifest because it is famous or useful. Advance it only when the evidence exists.
+
+## 10. Required-field boundary
+
+- Does the manifest include every field listed in `docs/required-vs-optional-fields.md`?
+- Does each required field provide useful information, or explicitly say `not-applicable`, `user-provided`, `unknown`, or `to-be-filled`?
+- Are optional fields used only when the manifest claims that capability?
+- If Slurm support is claimed, does `execution.slurm` include enough scheduler metadata for review?
