@@ -152,6 +152,52 @@ def validate_command_rendering_fixtures() -> list[str]:
     return errors
 
 
+def nonempty_string(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def validate_license_and_citation(data: dict) -> list[str]:
+    errors: list[str] = []
+
+    license_info = data.get("license")
+    if not isinstance(license_info, dict):
+        return ["license must be an object"]
+
+    for field in ("software", "data"):
+        if not nonempty_string(license_info.get(field)):
+            errors.append(f"license.{field} must be a non-empty string")
+
+    citation = data.get("citation")
+    if not isinstance(citation, dict):
+        errors.append("citation must be an object")
+    elif not nonempty_string(citation.get("preferred")):
+        errors.append("citation.preferred must be a non-empty string")
+
+    model_weights = data.get("model_weights")
+    if not isinstance(model_weights, dict):
+        errors.append("model_weights must be an object")
+        return errors
+
+    if model_weights.get("required") is True:
+        if not nonempty_string(license_info.get("model_weights")):
+            errors.append("license.model_weights must be set when model_weights.required is true")
+
+        sources = model_weights.get("sources")
+        if not isinstance(sources, list) or not sources:
+            errors.append("model_weights.sources must be non-empty when model_weights.required is true")
+        else:
+            for index, source in enumerate(sources):
+                if not isinstance(source, dict):
+                    errors.append(f"model_weights.sources[{index}] must be an object")
+                    continue
+                if not nonempty_string(source.get("license")):
+                    errors.append(f"model_weights.sources[{index}].license must be a non-empty string")
+                if not nonempty_string(source.get("checksum")):
+                    errors.append(f"model_weights.sources[{index}].checksum must be a non-empty string")
+
+    return errors
+
+
 def main() -> None:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     files = sorted(EXAMPLES_DIR.glob("*/opensciflow.yaml"))
@@ -163,7 +209,7 @@ def main() -> None:
         try:
             data = yaml.safe_load(path.read_text(encoding="utf-8"))
             jsonschema.validate(data, schema)
-            for error in validate_command_templates(data):
+            for error in validate_command_templates(data) + validate_license_and_citation(data):
                 errors.append(f"{path.relative_to(ROOT)}: {error}")
         except Exception as exc:  # noqa: BLE001 - report all validation failures clearly.
             errors.append(f"{path.relative_to(ROOT)}: {exc}")

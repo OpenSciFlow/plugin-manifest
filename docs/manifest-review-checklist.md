@@ -65,6 +65,8 @@ Use one of these outcomes:
 - Is the preferred citation or DOI included?
 - Are generated reports expected to carry citations forward?
 - Are license conflicts or unknown terms called out rather than hidden?
+- If model weights are required, do all weight sources include license and checksum fields?
+- Are license, citation, limitations, and safety notes expected to propagate into run records and reports?
 
 ## 8. Safety and limitations
 
