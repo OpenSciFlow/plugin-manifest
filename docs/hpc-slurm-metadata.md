@@ -75,6 +75,10 @@ The reviewed wrapper is responsible for translating normalized fields into site-
 - Can the dry run be executed on a login node, or must it run as a Slurm job?
 - Is the Slurm wrapper reviewed, and are its fillable arguments explicitly listed?
 
+Detailed reviewed-wrapper field rules:
+
+- `docs/reviewed-wrapper-fields.md`
+
 ## Safety boundaries
 
 An OpenSciFlow-compatible agent should not:

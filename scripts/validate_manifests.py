@@ -249,6 +249,65 @@ def validate_license_and_citation(data: dict) -> list[str]:
     return errors
 
 
+def validate_reviewed_wrapper_metadata(data: dict) -> list[str]:
+    errors: list[str] = []
+
+    execution = data.get("execution", {})
+    if not isinstance(execution, dict):
+        return errors
+
+    slurm = execution.get("slurm", {})
+    if not isinstance(slurm, dict):
+        return errors
+
+    has_submit_command = nonempty_string(slurm.get("submit_command"))
+    wrapper = slurm.get("reviewed_wrapper")
+
+    if not has_submit_command and wrapper is None:
+        return errors
+
+    if not has_submit_command:
+        errors.append("execution.slurm.submit_command must be set when reviewed_wrapper is declared")
+
+    if not isinstance(wrapper, dict):
+        errors.append("execution.slurm.reviewed_wrapper must be an object when submit_command is declared")
+        return errors
+
+    for field in ("path", "reviewed_by"):
+        if not nonempty_string(wrapper.get(field)):
+            errors.append(f"execution.slurm.reviewed_wrapper.{field} must be a non-empty string")
+
+    if wrapper.get("review_status") != "reviewed":
+        errors.append("execution.slurm.reviewed_wrapper.review_status must be 'reviewed'")
+
+    allowed_arguments = wrapper.get("allowed_arguments")
+    if not isinstance(allowed_arguments, list) or not allowed_arguments:
+        errors.append("execution.slurm.reviewed_wrapper.allowed_arguments must be a non-empty list")
+        return errors
+
+    seen: set[str] = set()
+    for index, argument in enumerate(allowed_arguments):
+        if not nonempty_string(argument):
+            errors.append(f"execution.slurm.reviewed_wrapper.allowed_arguments[{index}] must be a non-empty string")
+            continue
+        if argument in seen:
+            errors.append(f"execution.slurm.reviewed_wrapper.allowed_arguments contains duplicate {argument!r}")
+        seen.add(argument)
+
+    if "run_directory" not in seen:
+        errors.append("execution.slurm.reviewed_wrapper.allowed_arguments must include 'run_directory'")
+
+    recommended = slurm.get("recommended", {})
+    if not isinstance(recommended, dict):
+        recommended = {}
+
+    for argument in sorted(seen - {"run_directory"}):
+        if argument not in recommended:
+            errors.append(f"execution.slurm.recommended should declare reviewed wrapper argument {argument!r}")
+
+    return errors
+
+
 def main() -> None:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     files = sorted(EXAMPLES_DIR.glob("*/opensciflow.yaml"))
@@ -260,7 +319,12 @@ def main() -> None:
         try:
             data = yaml.safe_load(path.read_text(encoding="utf-8"))
             jsonschema.validate(data, schema)
-            for error in validate_command_templates(data) + validate_license_and_citation(data):
+            validators = (
+                validate_command_templates(data)
+                + validate_license_and_citation(data)
+                + validate_reviewed_wrapper_metadata(data)
+            )
+            for error in validators:
                 errors.append(f"{path.relative_to(ROOT)}: {error}")
         except Exception as exc:  # noqa: BLE001 - report all validation failures clearly.
             errors.append(f"{path.relative_to(ROOT)}: {exc}")

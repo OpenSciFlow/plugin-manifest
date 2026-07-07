@@ -171,6 +171,7 @@ Recommended flow:
 - `docs/protocol-change-process.md`
 - `docs/command-template-rules.md`
 - `docs/hpc-slurm-metadata.md`
+- `docs/reviewed-wrapper-fields.md`
 - `docs/required-vs-optional-fields.md`
 - `docs/r3-evidence-template.md`
 - `docs/validation-levels.md`
