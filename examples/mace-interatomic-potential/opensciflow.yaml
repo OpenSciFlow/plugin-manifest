@@ -62,11 +62,20 @@ execution:
     command: "mace_eval_configs --configs {inputs.configs_xyz} --model {inputs.model_file} --output {outputs_dir}/evaluated_configs.xyz"
   slurm:
     supported: true
+    submit_command: "sbatch {run_directory}/job.sbatch"
+    reviewed_wrapper:
+      path: "wrappers/mace-evaluate.sbatch"
+      review_status: "reviewed"
+      reviewed_by: "OpenSciFlow maintainers"
+      allowed_arguments: ["run_directory", "account", "partition", "time_limit", "cpu_cores", "memory_gb", "gpu_resources", "module"]
     recommended:
-      time: "01:00:00"
-      cpus_per_task: 4
-      mem: "16G"
-      gres: "gpu:1"
+      partition: null
+      account: null
+      time_limit: "01:00:00"
+      cpu_cores: 4
+      memory_gb: 16
+      gpu_resources: "gpu:1"
+      module: "mace/0.3"
 expected_runtime:
   small_example: "1-10 min depending on number of atoms/configurations and device"
 examples:

@@ -21,18 +21,20 @@ execution:
         - run_directory
         - account
         - partition
-        - time
-        - cpus_per_task
-        - mem
+        - time_limit
+        - cpu_cores
+        - memory_gb
+        - gpu_resources
+        - module
     recommended:
       partition:
       account:
-      time:
+      time_limit:
       nodes:
-      ntasks:
-      cpus_per_task:
-      mem:
-      gres:
+      tasks:
+      cpu_cores:
+      memory_gb:
+      gpu_resources:
       constraint:
       modules:
         - 
@@ -44,6 +46,22 @@ execution:
 ```
 
 Use `null` or omit site-specific values when they cannot be portable. Do not hard-code a private cluster account, username, or filesystem path.
+
+## Field naming convention
+
+OpenSciFlow uses normalized resource names in manifests, workflow templates, skill execution requests, and run records:
+
+| OpenSciFlow field | Slurm option usually rendered by wrapper |
+|---|---|
+| `account` | `#SBATCH --account` |
+| `partition` | `#SBATCH --partition` |
+| `time_limit` | `#SBATCH --time` |
+| `cpu_cores` | `#SBATCH --cpus-per-task` for single-task jobs |
+| `memory_gb` | `#SBATCH --mem` |
+| `gpu_resources` | `#SBATCH --gres` or site-specific GPU option |
+| `modules` / `module` | `module load ...` |
+
+The reviewed wrapper is responsible for translating normalized fields into site-specific Slurm options.
 
 ## Required review questions
 

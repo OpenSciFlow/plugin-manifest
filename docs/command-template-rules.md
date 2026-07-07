@@ -66,3 +66,5 @@ sbatch {run_directory}/job.sbatch
 ```
 
 The wrapper itself must carry separate review metadata and should be rendered into the approved run directory before submission.
+
+Wrapper arguments should use OpenSciFlow-normalized field names such as `time_limit`, `cpu_cores`, `memory_gb`, and `gpu_resources`. The wrapper maps those names to scheduler-specific flags such as `#SBATCH --time`, `#SBATCH --cpus-per-task`, `#SBATCH --mem`, and `#SBATCH --gres`.
