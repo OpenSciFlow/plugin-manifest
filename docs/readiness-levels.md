@@ -4,6 +4,8 @@ Readiness levels describe whether a manifest can be used by an OpenSciFlow-compa
 
 They do not certify scientific correctness.
 
+For the checks that generate readiness evidence, see `docs/validation-levels.md`.
+
 ## Levels
 
 | Level | Name | Meaning |

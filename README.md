@@ -101,13 +101,21 @@ limitations:
 
 ## Validation levels
 
-1. Schema validation: YAML parses and matches the JSON Schema.
-2. Metadata validation: license, citation, authors, and links exist.
-3. Command validation: command template renders without missing variables.
-4. Environment validation: Conda/Docker/Apptainer instructions are syntactically valid.
-5. Dry run: `--help` or version command succeeds.
-6. Smoke test: tiny example input produces expected files.
-7. Reproducibility check: input hashes, command, environment, tool versions, and output hashes are recorded.
+Validation levels are documented in:
+
+```text
+docs/validation-levels.md
+```
+
+Short version:
+
+- V1: schema validation.
+- V2: metadata validation.
+- V3: command-template validation.
+- V4: dry-run validation.
+- V5: smoke-test validation.
+- V6: run-record validation.
+- V7: workflow validation.
 
 ## Review process
 
@@ -158,6 +166,7 @@ Recommended flow:
 - `docs/command-template-rules.md`
 - `docs/hpc-slurm-metadata.md`
 - `docs/r3-evidence-template.md`
+- `docs/validation-levels.md`
 - `docs/protocol-roadmap.md`
 - `docs/readiness-levels.md`
 - `docs/agent-contract.md`
