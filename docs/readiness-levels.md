@@ -1,8 +1,8 @@
 # Readiness levels
 
-Readiness levels describe whether a manifest can be used by an OpenSciFlow-compatible local agent.
+Readiness levels describe evidence for an OpenSciFlow tool or capsule.
 
-They do not certify scientific correctness.
+They do not certify scientific correctness. They do not guarantee that a tool runs across all environments.
 
 For the checks that generate readiness evidence, see `docs/validation-levels.md`.
 
@@ -10,96 +10,91 @@ For the checks that generate readiness evidence, see `docs/validation-levels.md`
 
 | Level | Name | Meaning |
 |---|---|---|
-| R0 | Listed | Project is listed in the landscape but has no manifest. |
-| R1 | Draft manifest | Manifest exists and passes basic schema validation. |
-| R2 | Metadata reviewed | License, citation, inputs, outputs, environment, hardware, weights, safety notes, and limitations have been reviewed. |
-| R3 | Dry-run ready | Dry-run command succeeds in a documented environment. |
-| R4 | Smoke-test ready | Tiny example input produces expected files. |
-| R5 | Run-record ready | Execution produces a complete run record with input hashes, commands, versions, artifacts, citations, and limitations. |
-| R6 | Workflow ready | Manifest is used inside a workflow template with tested report generation. |
+| R0 | Project indexed only | Only a project link and basic information exist. |
+| R1 | Draft manifest | A manifest draft exists, but it has not been validated. |
+| R2 | Schema-validated manifest | The manifest passes schema validation. |
+| R3 | Environment spec and command templates available | Environment information and reviewed command templates exist. |
+| R4 | Smoke test passed in one environment | A minimal smoke test passed in at least one recorded environment. |
+| R5 | Example run passed with run record | A real example run passed in at least one environment and produced a run record. |
+| R6 | Multi-environment verification | The capsule has passed or failed with records across two or more heterogeneous environments. |
+| R7 | External reproduction | An external user or external machine reproduced the capsule successfully and recorded evidence. |
 
 ## Allowed agent behavior
 
-| Level | Agent may select? | Agent may execute? | Notes |
+| Level | Agent may inspect? | Agent may execute? | Notes |
 |---|---|---|---|
-| R0 | No | No | Landscape only. |
-| R1 | No by default | No | Review target only. |
-| R2 | With warning | No by default | Metadata is reviewed but not executable. |
-| R3 | Yes for readiness check | Dry-run only | No scientific output. |
-| R4 | Yes for demo | Smoke test only unless user provides explicit inputs. |
-| R5 | Yes | Yes with approval | Execution must write run record. |
-| R6 | Yes | Yes with workflow approval | Preferred level for BioPilot workflows. |
+| R0 | Yes | No | Landscape only. |
+| R1 | Yes | No | Draft metadata only. |
+| R2 | Yes | No by default | Schema-valid does not mean runnable. |
+| R3 | Yes | Readiness checks only by default | Commands exist but no smoke-test evidence yet. |
+| R4 | Yes | Smoke test with approval | Evidence applies only to the recorded environment. |
+| R5 | Yes | Example run with approval | Execution must write a run record. |
+| R6 | Yes | Yes with environment matching and approval | Multi-environment evidence exists but remains bounded. |
+| R7 | Yes | Yes with environment matching and approval | External reproduction exists; scientific correctness is still not certified. |
+
+## Interpretation rule
+
+- R1/R2 may reduce documentation-understanding cost.
+- R4/R5 may cautiously reduce trial-and-error cost in the verified environment.
+- R6/R7 provide stronger evidence for cross-environment migration or external reproduction.
+
+Do not claim a manifest reduces execution trial-and-error cost until at least R4 evidence exists.
+
+Do not claim cross-environment reproducibility until R6 or R7 evidence exists.
 
 ## Required evidence by level
 
 ### R1
 
+- Draft manifest exists.
+- Required fields are visible, even if incomplete.
+
+### R2
+
 - Manifest parses.
 - JSON Schema validation passes.
 - Required top-level fields exist.
 
-### R2
-
-- License fields are reviewed.
-- Citation fields are reviewed.
-- Model-weight/data terms are explicit.
-- Safety notes and limitations are domain-specific.
-- Maintainer or curator review is linked.
-
 ### R3
 
-- Dry-run command exists.
-- Environment instructions are sufficient to run the dry run.
-- Dry run records tool version where possible.
+- Environment spec exists.
+- Reviewed command templates or reviewed wrapper metadata exist.
+- Required inputs, outputs, model weights, licenses, citations, safety notes, and limitations are declared.
 
 ### R4
 
-- Tiny input is available or generated.
 - Smoke-test command exists.
-- Expected files are listed.
-- Smoke-test output does not require private data.
+- Smoke-test result is recorded.
+- Environment information is recorded.
+- Failure or success is explicit.
 
 ### R5
 
-- Run record includes:
-  - manifest name and version;
-  - workflow name, if applicable;
-  - input file hashes;
-  - rendered command;
-  - environment versions;
-  - model-weight source and checksum, if applicable;
-  - logs;
-  - output artifacts and hashes;
-  - citations;
-  - limitations;
-  - timestamps.
-- The run record should validate against the current BioPilot run-record schema when used by the reference prototype.
+- Example input exists or is regenerable.
+- Expected outputs are listed.
+- Example run completed.
+- Run record captures commands, versions, parameters, logs, return code, artifacts, hashes, citations, licenses, limitations, and warnings.
 
 ### R6
 
-- Workflow template references the manifest.
-- Workflow validation passes.
-- Report template renders.
-- Scientific claim boundaries appear in the report.
+- Two or more environments are recorded.
+- Differences between environments are explicit.
+- Known failures are not hidden.
+
+### R7
+
+- Reproduction evidence comes from an external user, machine, lab, or CI environment.
+- The reproduced run record is linked or included.
 
 ## Status labels
 
 Recommended issue labels:
 
-- `readiness:R0-listed`
-- `readiness:R1-draft`
-- `readiness:R2-reviewed`
-- `readiness:R3-dry-run`
+- `readiness:R0-indexed`
+- `readiness:R1-draft-manifest`
+- `readiness:R2-schema-validated`
+- `readiness:R3-env-and-commands`
 - `readiness:R4-smoke-test`
-- `readiness:R5-run-record`
-- `readiness:R6-workflow`
-
-## Rule for model manifests
-
-A model manifest cannot exceed R2 unless it records:
-
-- model-weight source;
-- model-weight license;
-- checksum or documented reason checksum is unavailable;
-- exact model version or release;
-- applicability-domain statement.
+- `readiness:R5-example-run`
+- `readiness:R6-multi-env`
+- `readiness:R7-external-reproduction`

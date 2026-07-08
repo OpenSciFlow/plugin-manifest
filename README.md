@@ -174,6 +174,7 @@ Recommended flow:
 - `docs/reviewed-wrapper-fields.md`
 - `docs/required-vs-optional-fields.md`
 - `docs/r3-evidence-template.md`
+- `docs/r4-smoke-test-evidence-template.md`
 - `docs/validation-levels.md`
 - `docs/protocol-roadmap.md`
 - `docs/readiness-levels.md`

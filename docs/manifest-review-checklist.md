@@ -77,14 +77,15 @@ Use one of these outcomes:
 
 ## 9. Readiness mapping
 
-Map the manifest to the lowest valid readiness level:
+Map the manifest or capsule to the lowest valid readiness level:
 
-- `R1` if it only passes schema validation.
-- `R2` if metadata has been reviewed.
-- `R3` if a dry run works in a documented environment.
-- `R4` if a smoke test works with tiny public input.
-- `R5` if execution writes a complete run record.
-- `R6` if the manifest is used inside a tested workflow template.
+- `R1` if it is only a draft manifest.
+- `R2` if it passes schema validation.
+- `R3` if environment specs and reviewed command templates are present.
+- `R4` if a smoke test passes in one recorded environment.
+- `R5` if an example run passes and writes a run record.
+- `R6` if multiple environments have recorded pass/fail evidence.
+- `R7` if an external user or machine reproduces it.
 
 Do not advance a manifest because it is famous or useful. Advance it only when the evidence exists.
 
