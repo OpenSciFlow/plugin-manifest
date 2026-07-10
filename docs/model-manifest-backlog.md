@@ -23,7 +23,7 @@ Planning document. Inclusion here does not mean the model is ready to run throug
 |---|---|---|
 | CHGNet | Atomistic model with clear model/version/applicability metadata needs | Confirm license and model-weight terms first |
 | MatterSim | Active atomistic model across elements, temperatures, and pressures | Record model coverage, device assumptions, and precision warnings |
-| REINVENT4 | Clear generative chemistry workflow | Strong limitations needed around synthesis, toxicity, and experimental validation |
+| REINVENT4 | Clear generative chemistry workflow | Scope the first manifest to one concrete workflow; record Apache-2.0 and derive scoring, config, output, and limitation fields from that workflow and the literature |
 | AiZynthFinder | Clear retrosynthesis planning task | Useful report-boundary example for route feasibility |
 | Protenix | Active biomolecular structure model | Need upstream correction on canonical metadata and execution assumptions |
 | Nucleotide Transformer | Genomics/transcriptomics foundation model | Need model-card/license/sequence-task boundaries |
